@@ -38,7 +38,11 @@ module MassInsert
       end
 
       def values_sql
-        "(#{array_of_attributes_sql.join('),(')});"
+        "(#{array_of_attributes_sql.join('),(')})#{returning_keys};"
+      end
+
+      def returning_keys
+        nil
       end
 
       def array_of_attributes_sql

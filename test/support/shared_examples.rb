@@ -52,6 +52,22 @@ def shared_examples
         User.mass_insert(values)
         assert_equal User.count, 1000
       end
+
+      it 'returns the ids' do
+        values = array_of_values_with(10)
+        ids = User.mass_insert(values, per_batch: 2)
+        assert_equal User.count, 10
+        assert_equal ids.size, 10
+        assert_equal ids.first, [User.first.id.to_s]
+      end
+
+      it 'returns the fields in the option' do
+        values = array_of_values_with(10)
+        returning = User.mass_insert(values, per_batch: 2, returning: [:id, :name])
+        assert_equal User.count, 10
+        user = User.first
+        assert_equal returning.first, [user.id.to_s, user.name]
+      end
     end
   end
 end

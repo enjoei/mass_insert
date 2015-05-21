@@ -8,12 +8,18 @@ module MassInsert
     end
 
     def start
+      results = []
+
       ActiveRecord::Base.transaction do
         values.each_slice(per_batch).each do |batch|
           query = builder.build(batch, options)
-          executer.execute(query)
+          result = executer.execute(query)
+
+          result.values.each {|v| results << v }
         end
       end
+
+      results if results.any?
     end
 
     private
@@ -28,6 +34,10 @@ module MassInsert
 
     def per_batch
       options[:per_batch] || Utilities.per_batch
+    end
+
+    def primary_key
+      @options[:class_name].primary_key
     end
   end
 end
