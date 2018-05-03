@@ -3,14 +3,14 @@ module MassInsert
     class AbstractAdapter < SimpleDelegator
       attr_accessor :values, :options
 
-      def initialize(class_name, values, options)
+      def initialize(values, options)
+        super(options.fetch(:class_name))
         @values  = values
         @options = options
-        super(class_name)
       end
 
       def to_sql
-        "#{insert_sql} #{values_sql}"
+        "#{insert_sql} #{values_sql};"
       end
 
       private
@@ -18,7 +18,7 @@ module MassInsert
       def columns
         @columns ||= begin
           columns = column_names
-          columns.delete(primary_key)
+          columns.delete(primary_key) unless options[:primary_key]
           columns.map(&:to_sym)
         end
       end
@@ -48,9 +48,15 @@ module MassInsert
       def array_of_attributes_sql
         values.map do |attrs|
           columns.map do |name|
-            value = attrs[name.to_sym] || attrs[name.to_s]
-            connection.quote(value, columns_hash[name.to_s])
+            value = column_value(attrs, name)
+            connection.quote(value)
           end.join(',')
+        end
+      end
+
+      def column_value(attrs, column)
+        attrs.fetch(column.to_sym) do
+          attrs.fetch(column.to_s, nil)
         end
       end
     end

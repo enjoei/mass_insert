@@ -1,13 +1,8 @@
 source 'https://rubygems.org'
 
+# Specify your gem's dependencies in mass_insert.gemspec
 gemspec
 
-gem 'mysql2'
-gem 'sqlite3'
-gem 'pg'
-
 gem 'simplecov'
+gem 'appraisal'
 gem 'coveralls', require: false
-
-gem 'rake'
-gem 'activerecord', '>= 3.2'
