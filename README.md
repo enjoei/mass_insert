@@ -1,4 +1,5 @@
-# MassInsert [![Build Status](https://travis-ci.org/alejandrogutierrez/mass_insert.png?branch=master)](https://travis-ci.org/alejandrogutierrez/mass_insert) [![Coverage Status](https://coveralls.io/repos/alejandrogutierrez/mass_insert/badge.png)](https://coveralls.io/r/alejandrogutierrez/mass_insert)
+# MassInsert
+[![Build Status](https://travis-ci.org/alejandrodevs/mass_insert.png?branch=master)](https://travis-ci.org/alejandrodevs/mass_insert) [![Coverage Status](https://coveralls.io/repos/github/alejandrodevs/mass_insert/badge.svg?branch=master)](https://coveralls.io/github/alejandrodevs/mass_insert?branch=master)
 
 This gem aims to provide an easy and faster way to do single database insertions in Rails.
 Support Mysql, PostgreSQL and SQLite3 adapters. It depends on ActiveRecord.
@@ -43,11 +44,53 @@ User.mass_insert(values)
 ```
 
 
-## Insertion per batches
+
+### Allow primary key
+Sometimes you can need to insert records forcing primary keys.
+Just pass the `primary_key` option with true. Example...
+```ruby
+values = [
+  {
+    id:     1000, # Force primary key.
+    name:   'Jay',
+    email:  'tremendous_gamer@gmail.com',
+    age:    15
+  }
+]
+
+User.mass_insert(values, primary_key: true)
+```
+
+
+### Insertion per batches
 Due you can get a database timeout error you can specify that the insertion will be in batches.
 Just pass the `per_batch` option with the records per batch. Example...
 ```ruby
 User.mass_insert(values, per_batch: 1000)
+```
+
+
+### Handle unique index on MySQL
+Sometimes we want to ignore errors when adding duplicated records. MySQL has
+the ability to do that with `ON DUPLICATE KEY UPDATE`. By using the option
+`handle_duplication` we will ignore the new values by doing:
+```ruby
+User.mass_insert(values, handle_duplication: true)
+```
+
+```sql
+INSERT INTO table (a,b,c) VALUES (1,2,3)
+  ON DUPLICATE KEY UPDATE a=a,b=b,c=c;
+```
+
+[Read more about MySQL ON DUPLICATE KEY UPDATE...](http://dev.mysql.com/doc/refman/5.7/en/insert-on-duplicate.html)
+
+
+## Running tests
+First at all copy `test/database.yml.example` to `test/database.yml` and update username and password
+for every database adapters. Then, run the following to test the gem against all adapters.
+```
+bundle exec rake test:all
 ```
 
 
